@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34003.232
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PostmodellingObjectiveComputation", "PostmodellingObjectiveComputation.pyproj", "{10223195-1946-4FF9-93C5-A2439BF9E17C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10223195-1946-4FF9-93C5-A2439BF9E17C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10223195-1946-4FF9-93C5-A2439BF9E17C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D879C142-350A-444D-9B5A-6E77FA956DF2}
+	EndGlobalSection
+EndGlobal
