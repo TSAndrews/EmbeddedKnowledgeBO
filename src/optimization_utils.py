@@ -42,7 +42,7 @@ def optimize_qehvi(model, train_x, problem, sampler, batch_size=1,tkwargs={"dtyp
     new_x = unnormalize(candidates.detach(), bounds=problem.bounds)
     return new_x
 
-def get_recomendations(train_x, train_obj, problem, model_initializer=initialize_model_fixed_noise,acquisition_func=optimize_qehvi,batch_size=1,mc_samples=1,model_initializer_kwargs={}):
+def get_recomendations(train_x, train_obj, problem, model_initializer,acquisition_func=optimize_qehvi,batch_size=1,mc_samples=1,model_initializer_kwargs={}):
     t0 = time.monotonic()
     dims=list(train_x.shape)
     dims[0]=0
