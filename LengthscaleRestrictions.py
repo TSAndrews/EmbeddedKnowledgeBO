@@ -7,10 +7,14 @@ from botorch.acquisition.objective import GenericMCObjective
 import warnings
 from botorch.exceptions import BadInitialCandidatesWarning
 from botorch.utils.multi_objective.box_decompositions.dominated import DominatedPartitioning
-from botorch.models.gp_regression import FixedNoiseGP
+from botorch.models.gp_regression import SingleTaskGP
 from botorch.models.model_list_gp_regression import ModelListGP
 from gpytorch.mlls.sum_marginal_log_likelihood import SumMarginalLogLikelihood
 from botorch.models.transforms.outcome import Standardize
+from typing import Optional
+from gpytorch.kernels import MaternKernel, ScaleKernel
+from gpytorch.priors.torch_priors import GammaPrior
+from gpytorch.constraints import Interval
 #from botorch.utils.multi_objective.pareto import is_non_dominated
 
 
@@ -30,14 +34,30 @@ NOISE_SE = torch.tensor([15.19, 0.63], **tkwargs)
 from src.benchmark import SnArModel
 problem = SnArModel().to(**tkwargs)
 
-def initialize_model_fixed_noise(train_x, train_obj,problem,noise):
+def get_matern_kernel_with_bounded_gamma_prior(ard_num_dims: int, batch_shape: Optional[torch.Size] = None, lengthscale_constraint: Optional[Interval] = None) -> ScaleKernel:
+    r"""Constructs the Scale-Matern kernel. Uses a Gamma(3.0, 6.0) prior for the lengthscale bounded by lengthscale_constraint
+    and a Gamma(2.0, 0.15) prior for the output scale.
+    """
+    return ScaleKernel(
+        base_kernel=MaternKernel(
+            nu=2.5,
+            ard_num_dims=ard_num_dims,
+            batch_shape=batch_shape,
+            lengthscale_prior=GammaPrior(3.0, 6.0),
+            lengthscale_constraint=lengthscale_constraint
+        ),
+        batch_shape=batch_shape,
+        outputscale_prior=GammaPrior(2.0, 0.15),
+    )
+
+def initialize_model_fitted_noise(train_x, train_obj,problem,noise,covar_module):
     # define models for objective and constraint
     train_x = normalize(train_x, problem.bounds)
     models = []
     for i in range(train_obj.shape[-1]):
         train_y = train_obj[..., i : i + 1]
         train_yvar = torch.full_like(train_y, noise[i] ** 2)
-        models.append(FixedNoiseGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1)))
+        models.append(SingleTaskGP(train_x, train_y, train_yvar, covar_module=covar_module,outcome_transform=Standardize(m=1)))
     model = ModelListGP(*models)
     mll = SumMarginalLogLikelihood(model.likelihood, model)
     return mll, model
@@ -74,6 +94,10 @@ iterations=20
 batch_size=1
 mc_samples = 128
 train_size=2 * (problem.dim + 1)
+num_model_outputs=torch.Size([1])
+min_lengthscale=0.1
+
+kernel=get_matern_kernel_with_bounded_gamma_prior(problem.dim,num_model_outputs,lengthscale_constraint=Interval(lower_bound=min_lengthscale))
 
 # call helper functions to generate initial training data and initialize model
 train_x_qehvi, t0 = generate_initial_sample(problem,n=train_size)
@@ -81,7 +105,7 @@ train_obj_qehvi = get_observation(train_x_qehvi,problem)
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
-    x_new,t=get_recomendations(train_x_qehvi,train_obj_qehvi,problem,model_initializer=initialize_model_fixed_noise,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"noise":NOISE_SE})
+    x_new,t=get_recomendations(train_x_qehvi,train_obj_qehvi,problem,model_initializer=initialize_model_fitted_noise,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"covar_module":kernel})
     obj_new=get_observation(x_new,problem)
     
     train_x_qehvi=torch.cat([train_x_qehvi,x_new])
@@ -96,19 +120,5 @@ for i in range(train_x_qehvi.shape[0]):
 import matplotlib.pyplot as plt
 plt.plot(hypervolume)
 plt.show()
-    
-    
-    
-    
-    
-    
-    
 
-
-    
-
-
-
-
-
-
+beta^alpha / Gamma(alpha) * x^(alpha - 1) * exp(-beta * x)
