@@ -1,7 +1,6 @@
 import os
 import time
 import torch
-from typing import Callable, Optional
 from torch import Tensor
 from botorch.utils.sampling import draw_sobol_samples
 from botorch.optim.optimize import optimize_acqf
@@ -9,54 +8,18 @@ from botorch.utils.multi_objective.box_decompositions.non_dominated import FastN
 from botorch.acquisition.multi_objective.monte_carlo import qExpectedHypervolumeImprovement
 from botorch.utils.transforms import unnormalize, normalize
 from botorch.sampling.normal import SobolQMCNormalSampler
-from botorch.acquisition.multi_objective import MCMultiOutputObjective
 from botorch import fit_gpytorch_mll
+from botorch.acquisition.multi_objective import MCMultiOutputObjective
+from typing import Callable, Optional
+from botorch.models.gp_regression import SingleTaskGP
+from botorch.models.model_list_gp_regression import ModelListGP
+from gpytorch.mlls.sum_marginal_log_likelihood import SumMarginalLogLikelihood
+from botorch.models.transforms.outcome import Standardize
 
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
 
 NUM_RESTARTS = 10 if not SMOKE_TEST else 2
 RAW_SAMPLES = 512 if not SMOKE_TEST else 4
-
-class GenericMCMultiObjective(MCMultiOutputObjective):
-    r"""Literaly a copy of GenericMCObjective but inheriting from MCMultiOutputObjective
-    Objective generated from a generic callable.
-
-    Allows to construct arbitrary MC-objective functions from a generic
-    callable. In order to be able to use gradient-based acquisition function
-    optimization it should be possible to backpropagate through the callable.
-
-    Example:
-        >>> generic_objective = GenericMCObjective(
-                lambda Y, X: torch.sqrt(Y).sum(dim=-1),
-            )
-        >>> samples = sampler(posterior)
-        >>> objective = generic_objective(samples)
-    """
-
-    def __init__(self, objective: Callable[[Tensor, Optional[Tensor]], Tensor]) -> None:
-        r"""
-        Args:
-            objective: A callable `f(samples, X)` mapping a
-                `sample_shape x batch-shape x q x m`-dim Tensor `samples` and
-                an optional `batch-shape x q x d`-dim Tensor `X` to a
-                `sample_shape x batch-shape x q`-dim Tensor of objective values.
-        """
-        super().__init__()
-        self.objective = objective
-
-    def forward(self, samples: Tensor, X: Optional[Tensor] = None) -> Tensor:
-        r"""Evaluate the objective on the samples.
-
-        Args:
-            samples: A `sample_shape x batch_shape x q x m`-dim Tensors of
-                samples from a model posterior.
-            X: A `batch_shape x q x d`-dim tensor of inputs. Relevant only if
-                the objective depends on the inputs explicitly.
-
-        Returns:
-            A `sample_shape x batch_shape x q`-dim Tensor of objective values.
-        """
-        return self.objective(samples, X=X)
     
 
 def generate_initial_sample(problem,n=6):
@@ -70,6 +33,18 @@ def get_observation(train_x,problem,noise=0):
     train_obj_true = problem(train_x)
     train_obj = train_obj_true + torch.randn_like(train_obj_true) * noise
     return train_obj
+
+def initialize_model(train_x, train_obj,problem,noise=None):
+    # define models for objective and constraint
+    train_x = normalize(train_x, problem.bounds)
+    models = []
+    for i in range(train_obj.shape[-1]):
+        train_y = train_obj[..., i : i + 1]
+        train_yvar = torch.full_like(train_y, noise[i] ** 2) if noise is not None else None
+        models.append(SingleTaskGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1)))
+    model = ModelListGP(*models)
+    mll = SumMarginalLogLikelihood(model.likelihood, model)
+    return mll, model
 
 def optimize_qehvi(model, train_x, problem, sampler, batch_size=1,tkwargs={"dtype": torch.double,"device": torch.device("cuda" if torch.cuda.is_available() else "cpu")},**kwargs):
     """Optimizes the qEHVI acquisition function, and returns a new candidate and observation."""
@@ -113,3 +88,52 @@ def get_recomendations(train_x, train_obj, problem, model_initializer,acquisitio
     t1 = time.monotonic()
             
     return x_qehvi, t1-t0
+
+class GenericMCMultiObjective(MCMultiOutputObjective):
+    r"""Literaly a copy of GenericMCObjective but inheriting from MCMultiOutputObjective
+    Objective generated from a generic callable.
+
+    Allows to construct arbitrary MC-objective functions from a generic
+    callable. In order to be able to use gradient-based acquisition function
+    optimization it should be possible to backpropagate through the callable.
+
+    Example:
+        >>> generic_objective = GenericMCObjective(
+                lambda Y, X: torch.sqrt(Y).sum(dim=-1),
+            )
+        >>> samples = sampler(posterior)
+        >>> objective = generic_objective(samples)
+    """
+
+    def __init__(self, objective: Callable[[Tensor, Optional[Tensor]], Tensor]) -> None:
+        r"""
+        Args:
+            objective: A callable `f(samples, X)` mapping a
+                `sample_shape x batch-shape x q x m`-dim Tensor `samples` and
+                an optional `batch-shape x q x d`-dim Tensor `X` to a
+                `sample_shape x batch-shape x q`-dim Tensor of objective values.
+        """
+        super().__init__()
+        self.objective = objective
+
+    def forward(self, samples: Tensor, X: Optional[Tensor] = None) -> Tensor:
+        r"""Evaluate the objective on the samples.
+
+        Args:
+            samples: A `sample_shape x batch_shape x q x m`-dim Tensors of
+                samples from a model posterior.
+            X: A `batch_shape x q x d`-dim tensor of inputs. Relevant only if
+                the objective depends on the inputs explicitly.
+
+        Returns:
+            A `sample_shape x batch_shape x q`-dim Tensor of objective values.
+        """
+        return self.objective(samples, X=X)
+    
+def objective_factory(objectives,problem):
+    """"""
+    def objective(Y,X):
+        X_raw=unnormalize(X,problem.bounds)
+        Ynew=[obj(Y,X_raw) for obj in objectives]
+        return torch.cat(Ynew,dim=-1)
+    return GenericMCMultiObjective(objective)

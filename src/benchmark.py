@@ -4,6 +4,7 @@ import torch
 from torch import Tensor
 from botorch.test_functions.base import BaseTestProblem
 
+
 class SnArModel(BaseTestProblem):
     """X=tau,equiv_pldn,conc_dfnb,temperature, Y=conc_products"""
     dim=4
@@ -53,3 +54,26 @@ class SnArModel(BaseTestProblem):
         r[4] = k_c * C[1] * C[2] + k_d * C[1] * C[3]
         
         return r
+    
+def compute_space_time_yield(Y,X):
+    if Y.dim()-X.dim()==1:
+        X=X.unsqueeze(0)
+    res_time=X[...,0].unsqueeze(-1)
+    sty=torch.div(Y,res_time)
+    return sty
+
+def compute_e_factor(Y,X):
+    if Y.dim()-X.dim()==1:
+        X=X.unsqueeze(0)
+    equiv_pldn=X[...,1].unsqueeze(-1)
+    conc_dfnb=X[...,2].unsqueeze(-1)
+    
+    rho_eth = 789  # g/L (should adjust to temp, but just using @ 25C)
+    
+    mass_reagents=(rho_eth + conc_dfnb*159.09 + equiv_pldn*conc_dfnb*71.11)#g/L. *1e3*q_tot = g/min 
+    mass_products=(Y*210.21)#g/L. *1e3*q_tot = g/min
+    mass_products[mass_products<1e-5]=1e-5
+    e_factor = mass_reagents / mass_products
+    e_factor[e_factor>1e3]=1e3
+    return 1e3-e_factor #minus to convert to maximization, 1e3 so ref_point can be saftely set to 0,0
+

@@ -27,6 +27,7 @@
     <Compile Include="PostmodellingObjectiveComputation.py" />
     <Compile Include="src\benchmark.py" />
     <Compile Include="src\optimization_utils.py" />
+    <Compile Include="src\__init__.py" />
     <Compile Include="temp.py" />
   </ItemGroup>
   <ItemGroup>
