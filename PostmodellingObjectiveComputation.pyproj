@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>10223195-1946-4ff9-93c5-a2439bf9e17c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>LengthscaleRestrictionsAdaptive.py</StartupFile>
+    <StartupFile>LengthscaleRestrictionsAdaptiveSampleDensity.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="LengthscaleRestrictionsAdaptiveSampleDensity.py" />
     <Compile Include="LengthscaleRestrictionsAdaptive.py" />
     <Compile Include="PostmodellingObjectiveComputationNoisy.py" />
     <Compile Include="LengthscaleRestrictions.py" />

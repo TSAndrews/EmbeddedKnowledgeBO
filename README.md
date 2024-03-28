@@ -1,4 +1,4 @@
-﻿# Embedding System Knowledge into Bayesian Optimizers
+﻿# Designing Bayesian Optimizers More Effeciently
 
 ## Introduction
 Bayesian optimization is often considered a black-box technique, however several simple modifications to 
@@ -44,10 +44,10 @@ more potential. The early lead is lost because the true optima does not lie at t
 however, since the post-modelling system preferencially targets experiments with higher theoretical maxima 
 based on the objectives, it may be possible to terminate the optimization process earlier if the upper bound
 of possible system response is also considered during the selection cycle. The addition of noise to the 
-system removes the early lead in hypervolume improventfor post-modelling objective computation over 
-pre-modelling computation. Hypervolume ncreases at aproximately the same rte in such cases. This is likely 
-due to the increased difficulty of resolving system noise in early iterations due to the low densiy of 
-experimentation.
+system can remove the early lead in hypervolume improvent for post-modelling objective computation over 
+pre-modelling computation. This is likely due to the increased difficulty of resolving system noise in early 
+iterations due to the low densiy of experimentation. The rate of hypervolume improvemnt is rarely less than 
+that achieved by computing objectives beforehand.
 
 ### The impacts of enforcing minimal lengthscales on noise stability
 
