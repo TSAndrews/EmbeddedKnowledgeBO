@@ -118,6 +118,7 @@ train_x_post=train_x.detach().clone()
 train_obj_post=acquisition_objective.objective(train_obj.unsqueeze(0),normalize(train_x,problem.bounds)).squeeze(dim=1).detach().clone()
 iter_time_post=iter_time.copy()
 print("post modelling test done!")
+
 ################################### plots & analysis ########################################################
 import matplotlib.pyplot as plt
 #----------------------------------Pre-------------------------------
@@ -131,6 +132,22 @@ hypervolume_post=[]
 for i in range(train_x_post.shape[0]):
     bd = DominatedPartitioning(ref_point=problem.ref_point, Y=acquisition_objective.objective(problem(train_x_post[0:i]).unsqueeze(0),normalize(train_x_post[0:i],problem.bounds)))
     hypervolume_post.append(bd.compute_hypervolume().item())
+    
+#-----------------------Save Data to csv-----------------------------
+import pandas as pd
+import numpy as np
+xpre=train_x_pre.numpy()
+xpost=train_x_post.numpy()
+ypre=train_obj_pre.squeeze(0).numpy()
+ypost=train_obj_post.squeeze(0).numpy()
+tpre=np.asarray(iter_time_pre).reshape((-1,1))
+tpost=np.asarray(iter_time_post).reshape((-1,1))
+hpre=np.asarray(hypervolume_pre).reshape((-1,1))
+hpost=np.asarray(hypervolume_post).reshape((-1,1))
+
+data=pd.DataFrame(np.concatenate((xpre,xpost,ypre,ypost,tpre,tpost,hpre,hpost),axis=1),columns=["ResTimePre","equiv_pldnPre","conc_dfnbPre","temperaturePre","ResTimePost","equiv_pldnPost","conc_dfnbPost","temperaturePost","STYPre","EFactorPre","STYPost","EFactorPost","itterTimePre","itterTimePost","hypervolumePre","hypervolumePost"])
+data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","PreVsPostModellingData.csv"))
+#---------------------------Plot-------------------------------------
 
 plt.plot(hypervolume_pre)
 plt.plot(hypervolume_post)

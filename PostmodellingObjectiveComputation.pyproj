@@ -41,10 +41,12 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="results\" />
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="results\PreVsPostModellingData.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
