@@ -73,17 +73,20 @@ def objective_factory(objectives):
 
 acquisition_objective=objective_factory([compute_space_time_yield,compute_e_factor])
 
-iterations=25
+iterations=50
 batch_size=1
 mc_samples = 128
 train_size=2 * (problem.dim + 1)
 
+################################### Initialization ########################################################
+train_x_raw, t0 = generate_initial_sample(problem,n=train_size)
+train_obj_raw = get_observation(train_x_raw,problem)
+
 ################################### pre-modelling objective computation ####################################
 
-# call helper functions to generate initial training data and initialize model
-train_x, t0 = generate_initial_sample(problem,n=train_size)
-train_obj_raw = get_observation(train_x,problem)
-train_obj = acquisition_objective.objective(train_obj_raw.unsqueeze(0),normalize(train_x,problem.bounds))
+train_x=train_x_raw.detach().clone()
+train_obj= acquisition_objective.objective(train_obj_raw.detach().clone().unsqueeze(0),normalize(train_x,problem.bounds))
+
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
@@ -101,9 +104,8 @@ iter_time_pre=iter_time.copy()
 print("pre modelling test done!")
 ################################### post-modelling objective computation ####################################
     
-# call helper functions to generate initial training data and initialize model
-train_x, t0 = generate_initial_sample(problem,n=train_size)
-train_obj = get_observation(train_x,problem)
+train_x=train_x_raw.detach().clone()
+train_obj=train_obj_raw.detach().clone()
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
