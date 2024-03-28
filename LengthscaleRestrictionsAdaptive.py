@@ -18,7 +18,7 @@ tkwargs = {
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
-NOISE = 1e-1
+NOISE = 0.01
 
 # ### Problem setup
 # from botorch.test_functions.multi_objective import BraninCurrin
@@ -28,15 +28,16 @@ problem = SnArModel(noise_std=NOISE).to(**tkwargs)
 
 acquisition_objective=objective_factory([compute_space_time_yield,compute_e_factor],problem)
 
-iterations=40
+iterations=50
 batch_size=1
 mc_samples = 128
 train_size=5#2 * (problem.dim + 1)
 batch_shape=None
-min_lengthscale=0.5
+n_points=5
+min_lengthscale_func=lambda n:(1/n)*n_points
 max_lengthscale=1e5
 
-kernel=get_matern_kernel_with_bounded_gamma_prior(problem.dim,batch_shape,lengthscale_constraint=Interval(lower_bound=min_lengthscale,upper_bound=max_lengthscale))
+
 
 ################################### Initialization ########################################################
 train_x_raw, t0 = generate_initial_sample(problem,n=train_size)
@@ -71,6 +72,8 @@ train_obj= acquisition_objective.objective(train_obj_raw.detach().clone().unsque
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
+    min_lengthscale=min_lengthscale_func(train_x.shape[-2])
+    kernel=get_matern_kernel_with_bounded_gamma_prior(problem.dim,batch_shape,lengthscale_constraint=Interval(lower_bound=min_lengthscale,upper_bound=max_lengthscale))
     x_new,t=get_recomendations(train_x,train_obj,problem,model_initializer=initialize_model,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"covar_module":kernel},tkwargs=tkwargs)
     obj_new_raw=get_observation(x_new,problem)
     obj_new = acquisition_objective.objective(obj_new_raw.unsqueeze(0),normalize(x_new,problem.bounds))
@@ -90,6 +93,8 @@ train_obj=train_obj_raw.detach().clone()
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
+    min_lengthscale=min_lengthscale_func(train_x.shape[-2])
+    kernel=get_matern_kernel_with_bounded_gamma_prior(problem.dim,batch_shape,lengthscale_constraint=Interval(lower_bound=min_lengthscale,upper_bound=max_lengthscale))
     x_new,t=get_recomendations(train_x,train_obj,problem,model_initializer=initialize_model,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"covar_module":kernel},acq_kwargs={"objective":acquisition_objective},tkwargs=tkwargs)
     obj_new=get_observation(x_new,problem)
     
@@ -142,7 +147,7 @@ hpreb=np.asarray(hypervolume_preb).reshape((-1,1))
 hpost=np.asarray(hypervolume_post).reshape((-1,1))
 
 data=pd.DataFrame(np.concatenate((xpre,xpreb,xpost,ypre,ypreb,ypost,tpre,tpreb,tpost,hpre,hpreb,hpost),axis=1),columns=["ResTimePre","equiv_pldnPre","conc_dfnbPre","temperaturePre","ResTimePreb","equiv_pldnPreb","conc_dfnbPreb","temperaturePreb","ResTimePost","equiv_pldnPost","conc_dfnbPost","temperaturePost","STYPre","EFactorPre","STYPreb","EFactorPreb","STYPost","EFactorPost","itterTimePre","itterTimePreb","itterTimePost","hypervolumePre","hypervolumePreb","hypervolumePost"])
-data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleData.csv"))
+data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleDataAdaptiveHighNoise.csv"))
 #---------------------------Plot-------------------------------------
 
 plt.plot(hypervolume_pre)

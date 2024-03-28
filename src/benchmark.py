@@ -60,6 +60,7 @@ def compute_space_time_yield(Y,X):
         X=X.unsqueeze(0)
     res_time=X[...,0].unsqueeze(-1)
     sty=torch.div(Y,res_time)
+    sty[sty<0]=0
     return sty
 
 def compute_e_factor(Y,X):
@@ -74,6 +75,6 @@ def compute_e_factor(Y,X):
     mass_products=(Y*210.21)#g/L. *1e3*q_tot = g/min
     mass_products[mass_products<1e-5]=1e-5
     e_factor = mass_reagents / mass_products
-    e_factor[e_factor>1e3]=1e3
-    return 1e3-e_factor #minus to convert to maximization, 1e3 so ref_point can be saftely set to 0,0
+    #e_factor[e_factor>1e3]=1e3
+    return 1/e_factor #inverse to convert to maximization ref_point can be saftely set to 0,0
 
