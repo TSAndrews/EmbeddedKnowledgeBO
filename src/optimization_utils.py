@@ -44,11 +44,7 @@ def initialize_model(train_x, train_obj,problem,noise=None,covar_module=None):#,
     for i in range(train_obj.shape[-1]):
         train_y = train_obj[..., i : i + 1]
         train_yvar = torch.full_like(train_y, noise[i] ** 2) if noise is not None else None
-        m=SingleTaskGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1))#,covar_module=covar_module)
-        if covar_module is not None:
-            m.covar_module=covar_module
-            # if subset_batch_dict is None: raise Exception("subset_batch_dict must be defined if a custom covariance kernel is provided as covar_module")
-            # m._subset_batch_dict=subset_batch_dict
+        m=SingleTaskGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1),covar_module=covar_module)
         models.append(m)
     model = ModelListGP(*models)
     mll = SumMarginalLogLikelihood(model.likelihood, model)

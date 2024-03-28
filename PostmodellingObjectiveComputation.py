@@ -30,7 +30,7 @@ acquisition_objective=objective_factory([compute_space_time_yield,compute_e_fact
 iterations=50
 batch_size=1
 mc_samples = 128
-train_size=2 * (problem.dim + 1)
+train_size=2#2 * (problem.dim + 1)
 
 ################################### Initialization ########################################################
 train_x_raw, t0 = generate_initial_sample(problem,n=train_size)
