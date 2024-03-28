@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>10223195-1946-4ff9-93c5-a2439bf9e17c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PostmodellingObjectiveComputation.py</StartupFile>
+    <StartupFile>PostmodellingObjectiveComputationNoisy.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PostmodellingObjectiveComputationNoisy.py" />
     <Compile Include="LengthscaleRestrictions.py" />
     <Compile Include="PostmodellingObjectiveComputation.py" />
     <Compile Include="src\benchmark.py" />
@@ -48,6 +49,7 @@
     <Content Include="requirements.txt" />
     <Content Include="results\MinLengthscaleData.csv" />
     <Content Include="results\PreVsPostModellingData.csv" />
+    <Content Include="results\PreVsPostModellingDataNoisy.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
