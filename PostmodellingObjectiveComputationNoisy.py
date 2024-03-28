@@ -18,7 +18,7 @@ tkwargs = {
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
-NOISE = 1e-1
+NOISE = 1e-2
 
 # ### Problem setup
 # from botorch.test_functions.multi_objective import BraninCurrin
@@ -108,7 +108,7 @@ hpre=np.asarray(hypervolume_pre).reshape((-1,1))
 hpost=np.asarray(hypervolume_post).reshape((-1,1))
 
 data=pd.DataFrame(np.concatenate((xpre,xpost,ypre,ypost,tpre,tpost,hpre,hpost),axis=1),columns=["ResTimePre","equiv_pldnPre","conc_dfnbPre","temperaturePre","ResTimePost","equiv_pldnPost","conc_dfnbPost","temperaturePost","STYPre","EFactorPre","STYPost","EFactorPost","itterTimePre","itterTimePost","hypervolumePre","hypervolumePost"])
-data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","PreVsPostModellingDataNoisyHigh.csv"))
+data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","PreVsPostModellingDataNoisy2.csv"))
 #---------------------------Plot-------------------------------------
 
 plt.plot(hypervolume_pre)

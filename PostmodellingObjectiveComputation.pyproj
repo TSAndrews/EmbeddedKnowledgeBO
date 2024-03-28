@@ -47,13 +47,17 @@
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="results\MinLengthscaleData1.csv" />
-    <Content Include="results\MinLengthscaleDataAdaptive.csv" />
+    <Content Include="results\MinLengthscaleData2.csv" />
     <Content Include="results\MinLengthscaleDataAdaptiveNoise1.csv" />
+    <Content Include="results\MinLengthscaleDataAdaptiveNoise2.csv" />
+    <Content Include="results\MinLengthscaleDataAdaptiveNoise3.csv" />
+    <Content Include="results\MinLengthscaleDataAdaptiveNoise4.csv" />
     <Content Include="results\PreVsPostModellingData1.csv" />
-    <Content Include="results\PreVsPostModellingDataNoisy.csv" />
     <Content Include="results\PreVsPostModellingDataNoisy1.csv" />
+    <Content Include="results\PreVsPostModellingDataNoisy2.csv" />
     <Content Include="results\README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

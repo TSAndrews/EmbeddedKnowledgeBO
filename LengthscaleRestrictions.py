@@ -18,7 +18,7 @@ tkwargs = {
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
-NOISE = 1e-1
+NOISE = 1e-2
 
 # ### Problem setup
 # from botorch.test_functions.multi_objective import BraninCurrin
@@ -28,7 +28,7 @@ problem = SnArModel(noise_std=NOISE).to(**tkwargs)
 
 acquisition_objective=objective_factory([compute_space_time_yield,compute_e_factor],problem)
 
-iterations=40
+iterations=50
 batch_size=1
 mc_samples = 128
 train_size=5#2 * (problem.dim + 1)
@@ -142,7 +142,7 @@ hpreb=np.asarray(hypervolume_preb).reshape((-1,1))
 hpost=np.asarray(hypervolume_post).reshape((-1,1))
 
 data=pd.DataFrame(np.concatenate((xpre,xpreb,xpost,ypre,ypreb,ypost,tpre,tpreb,tpost,hpre,hpreb,hpost),axis=1),columns=["ResTimePre","equiv_pldnPre","conc_dfnbPre","temperaturePre","ResTimePreb","equiv_pldnPreb","conc_dfnbPreb","temperaturePreb","ResTimePost","equiv_pldnPost","conc_dfnbPost","temperaturePost","STYPre","EFactorPre","STYPreb","EFactorPreb","STYPost","EFactorPost","itterTimePre","itterTimePreb","itterTimePost","hypervolumePre","hypervolumePreb","hypervolumePost"])
-data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleData.csv"))
+data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleData2.csv"))
 #---------------------------Plot-------------------------------------
 
 plt.plot(hypervolume_pre)

@@ -33,7 +33,7 @@ batch_size=1
 mc_samples = 128
 train_size=5#2 * (problem.dim + 1)
 batch_shape=None
-n_points=5
+n_points=3
 min_lengthscale_func=lambda n:(1/n)*n_points
 max_lengthscale=1e5
 
@@ -120,7 +120,7 @@ for i in range(train_x_pre.shape[0]):
 
 #----------------------------------Pre-------------------------------
 hypervolume_preb=[]
-for i in range(train_x_pre.shape[0]):
+for i in range(train_x_preb.shape[0]):
     bd = DominatedPartitioning(ref_point=problem.ref_point, Y=acquisition_objective.objective(problem(train_x_preb[0:i]).unsqueeze(0),normalize(train_x_preb[0:i],problem.bounds)))
     hypervolume_preb.append(bd.compute_hypervolume().item())
 
@@ -147,7 +147,7 @@ hpreb=np.asarray(hypervolume_preb).reshape((-1,1))
 hpost=np.asarray(hypervolume_post).reshape((-1,1))
 
 data=pd.DataFrame(np.concatenate((xpre,xpreb,xpost,ypre,ypreb,ypost,tpre,tpreb,tpost,hpre,hpreb,hpost),axis=1),columns=["ResTimePre","equiv_pldnPre","conc_dfnbPre","temperaturePre","ResTimePreb","equiv_pldnPreb","conc_dfnbPreb","temperaturePreb","ResTimePost","equiv_pldnPost","conc_dfnbPost","temperaturePost","STYPre","EFactorPre","STYPreb","EFactorPreb","STYPost","EFactorPost","itterTimePre","itterTimePreb","itterTimePost","hypervolumePre","hypervolumePreb","hypervolumePost"])
-data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleDataAdaptiveHighNoise.csv"))
+data.to_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),"results","MinLengthscaleDataAdaptiveNoise4.csv"))
 #---------------------------Plot-------------------------------------
 
 plt.plot(hypervolume_pre)
