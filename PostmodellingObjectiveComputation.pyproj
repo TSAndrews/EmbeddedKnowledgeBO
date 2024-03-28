@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>10223195-1946-4ff9-93c5-a2439bf9e17c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PostmodellingObjectiveComputationNoisy.py</StartupFile>
+    <StartupFile>LengthscaleRestrictionsAdaptive.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="LengthscaleRestrictionsAdaptive.py" />
     <Compile Include="PostmodellingObjectiveComputationNoisy.py" />
     <Compile Include="LengthscaleRestrictions.py" />
     <Compile Include="PostmodellingObjectiveComputation.py" />
@@ -47,9 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
-    <Content Include="results\MinLengthscaleData.csv" />
-    <Content Include="results\PreVsPostModellingData.csv" />
+    <Content Include="results\MinLengthscaleData1.csv" />
+    <Content Include="results\MinLengthscaleDataAdaptive.csv" />
+    <Content Include="results\MinLengthscaleDataAdaptiveNoise1.csv" />
+    <Content Include="results\PreVsPostModellingData1.csv" />
     <Content Include="results\PreVsPostModellingDataNoisy.csv" />
+    <Content Include="results\PreVsPostModellingDataNoisy1.csv" />
+    <Content Include="results\README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
