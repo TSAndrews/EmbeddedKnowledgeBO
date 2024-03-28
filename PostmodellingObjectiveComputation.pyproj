@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>10223195-1946-4ff9-93c5-a2439bf9e17c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PostmodellingObjectiveComputation.py</StartupFile>
+    <StartupFile>LengthscaleRestrictions.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,7 +23,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="LengthscaleRestrictions.py" />
-    <Compile Include="multi_objective_bo.py" />
     <Compile Include="PostmodellingObjectiveComputation.py" />
     <Compile Include="src\benchmark.py" />
     <Compile Include="src\optimization_utils.py" />

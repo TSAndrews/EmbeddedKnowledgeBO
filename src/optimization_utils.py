@@ -15,6 +15,9 @@ from botorch.models.gp_regression import SingleTaskGP
 from botorch.models.model_list_gp_regression import ModelListGP
 from gpytorch.mlls.sum_marginal_log_likelihood import SumMarginalLogLikelihood
 from botorch.models.transforms.outcome import Standardize
+from gpytorch.kernels import MaternKernel, ScaleKernel
+from gpytorch.priors.torch_priors import GammaPrior
+from gpytorch.constraints import Interval
 
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
 
@@ -34,14 +37,19 @@ def get_observation(train_x,problem,noise=0):
     train_obj = train_obj_true + torch.randn_like(train_obj_true) * noise
     return train_obj
 
-def initialize_model(train_x, train_obj,problem,noise=None):
+def initialize_model(train_x, train_obj,problem,noise=None,covar_module=None):#,subset_batch_dict=None):
     # define models for objective and constraint
     train_x = normalize(train_x, problem.bounds)
     models = []
     for i in range(train_obj.shape[-1]):
         train_y = train_obj[..., i : i + 1]
         train_yvar = torch.full_like(train_y, noise[i] ** 2) if noise is not None else None
-        models.append(SingleTaskGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1)))
+        m=SingleTaskGP(train_x, train_y, train_yvar, outcome_transform=Standardize(m=1))#,covar_module=covar_module)
+        if covar_module is not None:
+            m.covar_module=covar_module
+            # if subset_batch_dict is None: raise Exception("subset_batch_dict must be defined if a custom covariance kernel is provided as covar_module")
+            # m._subset_batch_dict=subset_batch_dict
+        models.append(m)
     model = ModelListGP(*models)
     mll = SumMarginalLogLikelihood(model.likelihood, model)
     return mll, model
@@ -137,3 +145,19 @@ def objective_factory(objectives,problem):
         Ynew=[obj(Y,X_raw) for obj in objectives]
         return torch.cat(Ynew,dim=-1)
     return GenericMCMultiObjective(objective)
+
+def get_matern_kernel_with_bounded_gamma_prior(ard_num_dims: int, batch_shape: Optional[torch.Size] = None, lengthscale_constraint: Optional[Interval] = None) -> ScaleKernel:
+    r"""Constructs the Scale-Matern kernel. Uses a Gamma(3.0, 6.0) prior for the lengthscale bounded by lengthscale_constraint
+    and a Gamma(2.0, 0.15) prior for the output scale.
+    """
+    return ScaleKernel(
+        base_kernel=MaternKernel(
+            nu=2.5,
+            ard_num_dims=ard_num_dims,
+            batch_shape=batch_shape,
+            lengthscale_prior=GammaPrior(3.0, 6.0),
+            lengthscale_constraint=lengthscale_constraint
+        ),
+        batch_shape=batch_shape,
+        outputscale_prior=GammaPrior(2.0, 0.15),
+    )

@@ -17,7 +17,7 @@ tkwargs = {
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
 SMOKE_TEST = os.environ.get("SMOKE_TEST")
-NOISE_SE = torch.tensor([1e-3]*4, **tkwargs)
+NOISE_SE = torch.tensor([1e-3]*2, **tkwargs)
 
 # ### Problem setup
 # from botorch.test_functions.multi_objective import BraninCurrin
@@ -44,7 +44,7 @@ train_obj= acquisition_objective.objective(train_obj_raw.detach().clone().unsque
 
 iter_time=[t0/train_size]*train_size
 for _ in range(iterations):
-    x_new,t=get_recomendations(train_x,train_obj,problem,model_initializer=initialize_model,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"noise":NOISE_SE})
+    x_new,t=get_recomendations(train_x,train_obj,problem,model_initializer=initialize_model,acquisition_func=optimize_qehvi, batch_size=batch_size,mc_samples=mc_samples,model_initializer_kwargs={"noise":NOISE_SE},tkwargs=tkwargs)
     obj_new_raw=get_observation(x_new,problem)
     obj_new = acquisition_objective.objective(obj_new_raw.unsqueeze(0),normalize(x_new,problem.bounds))
     
