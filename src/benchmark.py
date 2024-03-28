@@ -9,6 +9,9 @@ class SnArModel(BaseTestProblem):
     dim=4
     num_objectives=1
     _bounds=[(0.5,2.0),(1.0,5.0),(0.1,0.5),(30,120)]
+    _ref_point = [0, 0]
+    ref_point = torch.tensor(_ref_point, dtype=torch.float)
+    
         
     def evaluate_true(self, X: Tensor) -> Tensor:
         r"""Evaluate the function (w/o observation noise) on a set of points."""
@@ -17,7 +20,7 @@ class SnArModel(BaseTestProblem):
             C_i = np.zeros(5)
             C_i[0] = conc_dfnb
             C_i[1] = equiv_pldn * conc_dfnb
-            res = solve_ivp(self._integrand, [0, tau], C_i, args=(temperature,),kwargs={"C_i":C_i})
+            res = solve_ivp(self._integrand, [0, tau], C_i, args=(temperature,C_i))
             C_final = res.y[:, -1]
             conc_product=C_final[-1].reshape((-1,1))
             Y=torch.cat([Y,torch.from_numpy(conc_product)],dim=0)
