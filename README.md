@@ -53,7 +53,7 @@ counteract the low residence time bias being introduced by the space time yield 
 most systems by enabling domain reduction. There is a known upper bound for yields as we cannot create matter. This means that it 
 can be known that increasing residence time cannot possibly improve metrics such as space time yield because yields may need to be
 greater than possible in order to counteract the time effects. Biasing exploration towards regions of short residence 
-time increases the likelihood of being able to shrink the domain.
+time increases the likelihood of being able to reduce the domain size.
 
 ## Conclusions
 Computing performance metrics after modelling can significantly reduce computation time if multiple metrics are derived from the same
@@ -62,7 +62,10 @@ a few different sensors.
 Computing performance metrics after modelling increases the early rate of improvement of the system due to the increased knowledge of
 the effects of reactor parameters on the metrics, but this early bias likely decreases exploration rate, and thus does little to improve
 the overall optimization times. It’s possible that these drawbacks could be overcome by the use of non-constant priors or by merely 
-enforcing a spacing criterion during experimental selection in early iterations.
+enforcing a spacing criterion during experimental selection in early iterations. 
+
+This research only serves as a precursory study of the effects of post modelling metric computation. There was insufficient 
+exploration of benchmarks or algorithm parameters to have a strong confidence in the findings. Further research is still required.
 
 ## References:
 1. Felton, K. C., Rittig, J. G., & Lapkin, A. A. (2021), [Summit: benchmarking machine learning methods for reaction optimisation](https://doi.org/10.1002/cmtd.202000051). _Chemistry‐Methods_, _1_(2), 116-122.
