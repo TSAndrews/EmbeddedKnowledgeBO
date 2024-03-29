@@ -1,26 +1,24 @@
-﻿# Designing Bayesian Optimizers More Effeciently
+﻿# The Effects of Post-Modelling Performance Metric Computation on the Performance of Bayesian Optimizers
 
 ## Introduction
 Bayesian optimization is often considered a black-box technique, however several simple modifications to 
-the design can vastly increase the optimizers computational and iterative performance on certain tasks. 
-Two such modifications will be explored in this work; post-modelling objective computation for enhanced 
-computational efficiency and improved knowledge integration, and minimum length-scale enforcement for 
-increased stability of optimizers to system noise when using homoscedastic noise modelling.
+the design can vastly increase the optimizers computational and iterative performance on certain tasks. The
+modification explored here relates to what aspects of a problem are actually modeled during the optimization 
+procedure. Raw data collected is not typically in a form that properly represents the value of the systems 
+state and often needs to be transformed into one or more performance metrics that are desired to be optimized.
+Traditionaly, these performance metrics are what get modeled during the Bayesian optimization process but this 
+leads to a loss of the structural knowledge introduced by the transforms. If the paramters being optimized 
+are featured in the performance calculations, knowledge of these influences are lost from the system. Modelling 
+only the raw data may also reduce the number of models that need be fitted in multiobjective problems. There is 
+no need to create a sepearate model for each if metrics if they are derived from the same raw data. This can 
+result in significant computational savings for the optimization runs. Another potential benifit lies with the
+form of the models themselves. Many performance metrics increase the complexity of the models. This increase in
+complexity could degrade the fit of the models, and result in a decrease in the overall performance of the 
+optimizer. The form of raw data moodels are also likely to be better understood by domain experts which could 
+also increase the ease of designing covarience kernels that are better suited to the data. 
 
-Post-modelling objective computation often reduces the number of models that need be fitted to the data 
-and can result in them having a more representative posterior as the transformations created by the 
-formulating the objectives can be decoupled from the raw measurement values.
-
-Bayesian optimizers utilizing homoscedastic noise modelling must balance both fitting of both the kernels 
-and the noise. Methods optimizing the marginal likelihood are prone to overfitting the kernels during 
-early iterations leading to suboptimal algorithm performance. This is due to the presence of a second 
-optima in the marginal likelihood curve with respect to length-scale which occurs when the model stops
-explaining the system noise with the fitted kernels and instead begins correctly capturing it in the 
-inferred system noise. Providing a minimum length-scale can help locate this secondary optima and ensure
-that the kernels only capture the base trends and not the system noise. 
-
-The impacts of these modifications on computational and iterative performance were demonstrated on
-the optimization of a simulated nucleophilic aromatic substitution reaction system. This simulated 
+The impacts of performance metric computation order on computational and iterative effeciency were investigated using
+the optimization of a simulated nucleophilic aromatic substitution reaction system as a case study. This simulated 
 system was adapted from the summit software package<sup>1</sup> and is based on the works of Hone et 
 al.<sup>2</sup>. The system was optimized to maximize space-time yield and minimize reaction E-factor. 
 These are common industrial measures for production rate and material wastage respectively. Both of these
@@ -28,29 +26,42 @@ metrics can be calculated from the concentration of product produced by a reacti
 parameters such as duration and initial reactant quantities.
 
 ## Results
-### The effect of post-modelling objective computation
-Computation of objectives from a single model of yield halved the computation time for each iteration of 
+Computation of performance metrics from a single model for yield halved the computation time for each iteration of 
 the optimizer compared to modelling both space-time yield and E-factor separately. This is to be expected. 
 Model fitting is typically the most computationally intensive task during bayesian optimization and so 
 reducing the number of models that need be fitted has a significant impact on computation time.
 
-Post-modelling objective computation does not appear to have a significant impact on the convergence rate of 
-the optimizer. When data has a low noise level, post-modelling objective computation does typically increase
-hypervolume more rapidly than pre-modelling objective computation in early iterations, but this lead drops 
-off fairly quickly and both ojective computation methods generally reach the optima in aproximately the same
-number of intervals. The post-modelling objective computation effectively acts as a non constant prior in 
-these examples, and so the early lead is likely a result of this bias pushing selection to regions that have
-more potential. The early lead is lost because the true optima does not lie at the optima of the prior, 
-however, since the post-modelling system preferencially targets experiments with higher theoretical maxima 
-based on the objectives, it may be possible to terminate the optimization process earlier if the upper bound
-of possible system response is also considered during the selection cycle. The addition of noise to the 
-system can remove the early lead in hypervolume improvent for post-modelling objective computation over 
-pre-modelling computation. This is likely due to the increased difficulty of resolving system noise in early 
-iterations due to the low densiy of experimentation. The rate of hypervolume improvemnt is rarely less than 
-that achieved by computing objectives beforehand.
+Post-modelling performance metric computation does not appear to have a significant impact on the convergence rate of 
+the optimizer. When data has a low noise level, post-modelling performance metric computation does typically increase
+hypervolume more rapidly than computing performance metrics prior to modelling in early iterations, but this lead drops 
+off fairly quickly and both ojective computation methods generally reach the optima at aproximately the same
+time. This is because post-modelling performance metric computation biases selection toward regions that have
+high value experimental conditions based on the metrics without considering the responses of the system under these conditions.
+For instance, the optimizer will be biased towards low residence times because time is a key component of space time yield, but
+these conditions are not necessarily optimal because residence time and yields are inversly proportional. As such, the optima of
+the system may not lie at minimal residence times if the drop in yields exceed the increase in speed. Post-modelling computation 
+gets an early lead due to its better understanding of the impact of the impact of reactor paramters on the metrics values, but it
+still needs to determine the effects of yields to determine the optima. The early bias likely hinders exploration of the domain
+counteracting the benifits of increased knowledge integration as iterations progress. 
 
+
+
+The drawbacks of the bias introduced by post-modelling metric computation could likely be counteracted by more intelligent design
+of the priors of the optimizer. It is typically known that yields are likely to decrease with decreasing residence time which would
+counteract the low residence time bias being introduced by the space time yield performance metric. The bias may even be useful in 
+most systems by enabling domain reduction. There is a known upper bound for yields as we cannot create matter. This means that it 
+can be known that increasing residence time cannot possibly improve metrics such as space time yield because yields may need to be
+greater than possible in order to counteract the time effects. Biasing exploration exploration towards regions of short residence 
+time increases the liklihood of being able to shrink the domain.
 
 ## Conclusions
+Computing performance metrics after modelling can significantly reduce computation time if multiple metrics are derived from the same
+measurments. These improvements will be especially noticable for problems with a large number of metrics to be optimized based on only 
+a few different sensors.
+Computing performance metrics after modelling increases the early rate of improvement of the system due to the incrreased knowledge of
+the effects of reactor parameters on the metrics, but this early bias likely deacreases exploration rate, and thus does little to improve
+the overall optimization times. Its possible that these drawbacks could be overcome by the use of non-constant priors or by mearly 
+enforcing a spacing criteria during experimental selection in early iterations.
 
 ## References:
 1. Felton, K. C., Rittig, J. G., & Lapkin, A. A. (2021), [Summit: benchmarking machine learning methods for reaction optimisation](https://doi.org/10.1002/cmtd.202000051). _Chemistry‐Methods_, _1_(2), 116-122.

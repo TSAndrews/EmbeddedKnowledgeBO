@@ -49,6 +49,7 @@
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HypervolumePlotMetricCompOrder.png" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="results\MinLengthscaleData1.csv" />
