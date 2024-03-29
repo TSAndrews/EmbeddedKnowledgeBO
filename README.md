@@ -1,4 +1,4 @@
-﻿# The Effects of Post-Modelling Performance Metric Computation on the Performance of Bayesian Optimizers
+﻿# The Effects of Post-Modelling Performance Metric Computation on the Efficiency of Bayesian Optimizers
 
 ## Introduction
 Bayesian optimization is often considered a black-box technique, however several simple modifications to 
