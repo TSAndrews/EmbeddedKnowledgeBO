@@ -44,7 +44,7 @@ gets an early lead due to its better understanding of the impact of the impact o
 still needs to determine the effects of yields to determine the optima. The early bias likely hinders exploration of the domain
 counteracting the benifits of increased knowledge integration as iterations progress. 
 
-![Plot of hypervolume improvement against iteration number for post-modelling performance metric computation (orange line) and pre-modelling metric computation (blue dashed)](https://github.com/TSAndrews/EmbeddedKnowledgeBO/blob/5ba847fea9eacf5ec4864fba6ede93fdf716f72b/HypervolumePlotMetricCompOrder.png?raw=True)
+![Plot of hypervolume improvement against iteration number](https://github.com/TSAndrews/EmbeddedKnowledgeBO/blob/b9df31f1587068a08dc98b9ba5ce14b0cd856056/results/HypervolumePlotMetricCompOrder.png?raw=True)
 *Figure 1: Plot of hypervolume improvement against iteration number for post-modelling performance metric computation (orange line) and pre-modelling metric computation (blue dashed)*
 
 The drawbacks of the bias introduced by post-modelling metric computation could likely be counteracted by more intelligent design
