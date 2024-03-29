@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>10223195-1946-4ff9-93c5-a2439bf9e17c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>LengthscaleRestrictionsAdaptiveSampleDensity.py</StartupFile>
+    <StartupFile>conceptPlotsTransformLengthscale.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="conceptPlotsTransformLengthscale.py" />
     <Compile Include="LengthscaleRestrictionsAdaptiveSampleDensity.py" />
     <Compile Include="LengthscaleRestrictionsAdaptive.py" />
     <Compile Include="PostmodellingObjectiveComputationNoisy.py" />
@@ -30,7 +31,7 @@
     <Compile Include="src\benchmark.py" />
     <Compile Include="src\optimization_utils.py" />
     <Compile Include="src\__init__.py" />
-    <Compile Include="temp.py" />
+    <Compile Include="conceptPlotsTransform.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">

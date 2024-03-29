@@ -19,20 +19,20 @@ explaining the system noise with the fitted kernels and instead begins correctly
 inferred system noise. Providing a minimum length-scale can help locate this secondary optima and ensure
 that the kernels only capture the base trends and not the system noise. 
 
-The impacts of these modifications on computational and iterative performance will be demonstrated using
+The impacts of these modifications on computational and iterative performance were demonstrated on
 the optimization of a simulated nucleophilic aromatic substitution reaction system. This simulated 
 system was adapted from the summit software package<sup>1</sup> and is based on the works of Hone et 
-al.<sup>2</sup>.
+al.<sup>2</sup>. The system was optimized to maximize space-time yield and minimize reaction E-factor. 
+These are common industrial measures for production rate and material wastage respectively. Both of these
+metrics can be calculated from the concentration of product produced by a reaction and the set experimental 
+parameters such as duration and initial reactant quantities.
 
 ## Results
 ### The effect of post-modelling objective computation
-Computation of objectives after the fitting of models results in a significant reduction in the required 
-computation cost when identifying exploration points for the nucleophilic aromatic substitution system.
-This is due to the fact that only one model need be fitted to describe both objectives as both space-time 
-yield and E-factor can be computed from the measured yields of the system. Bayesian optimization 
-iterations were typically twice as fast when computing objectives after modelling due to this reduction 
-in dimensionality during the modelling process. Computation cost generally decreases over time, likely due to 
-the increased ease of optimizing kernel hyperparameters to maximize the likelihood  when more data is present.
+Computation of objectives from a single model of yield halved the computation time for each iteration of 
+the optimizer compared to modelling both space-time yield and E-factor separately. This is to be expected. 
+Model fitting is typically the most computationally intensive task during bayesian optimization and so 
+reducing the number of models that need be fitted has a significant impact on computation time.
 
 Post-modelling objective computation does not appear to have a significant impact on the convergence rate of 
 the optimizer. When data has a low noise level, post-modelling objective computation does typically increase
@@ -49,7 +49,6 @@ pre-modelling computation. This is likely due to the increased difficulty of res
 iterations due to the low densiy of experimentation. The rate of hypervolume improvemnt is rarely less than 
 that achieved by computing objectives beforehand.
 
-### The impacts of enforcing minimal lengthscales on noise stability
 
 ## Conclusions
 
