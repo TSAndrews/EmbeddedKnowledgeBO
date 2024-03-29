@@ -33,8 +33,8 @@ reducing the number of models that need be fitted has a significant impact on co
 
 Post-modelling performance metric computation does not appear to have a significant impact on the convergence rate of 
 the optimizer. When data has a low noise level, post-modelling performance metric computation does typically increase
-hypervolume more rapidly than computing performance metrics prior to modelling in early iterations, but this lead drops 
-off fairly quickly and both ojective computation methods generally reach the optima at aproximately the same
+hypervolume more rapidly than computing performance metrics prior to modelling in early iterations, as can be seen from Figure 1, but this lead is 
+lost fairly quickly and both ojective computation methods generally reach the optima at the same
 time. This is because post-modelling performance metric computation biases selection toward regions that have
 high value experimental conditions based on the metrics without considering the responses of the system under these conditions.
 For instance, the optimizer will be biased towards low residence times because time is a key component of space time yield, but
@@ -44,7 +44,8 @@ gets an early lead due to its better understanding of the impact of the impact o
 still needs to determine the effects of yields to determine the optima. The early bias likely hinders exploration of the domain
 counteracting the benifits of increased knowledge integration as iterations progress. 
 
-
+![Plot of hypervolume improvement against iteration number for post-modelling performance metric computation (orange line) and pre-modelling metric computation (blue dashed)](https://github.com/TSAndrews/EmbeddedKnowledgeBO/blob/5ba847fea9eacf5ec4864fba6ede93fdf716f72b/HypervolumePlotMetricCompOrder.png?raw=True)
+*Figure 1: Plot of hypervolume improvement against iteration number for post-modelling performance metric computation (orange line) and pre-modelling metric computation (blue dashed)*
 
 The drawbacks of the bias introduced by post-modelling metric computation could likely be counteracted by more intelligent design
 of the priors of the optimizer. It is typically known that yields are likely to decrease with decreasing residence time which would
